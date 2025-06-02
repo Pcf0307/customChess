@@ -16,4 +16,35 @@ public class HalmaChessBoard extends BaseChessBoard {
     private Set<Point> targetPositions;
     //moveHistory
 
+    public int getBoardSize() {
+        return boardSize;
+    }
+
+    public void setBoardSize(int boardSize) {
+        this.boardSize = boardSize;
+    }
+
+    public BaseChessPiece[][] getGrid() {
+        return grid;
+    }
+
+    public void setGrid(BaseChessPiece[][] grid) {
+        this.grid = grid;
+    }
+
+    public Set<Point> getStartingPositions() {
+        return startingPositions;
+    }
+
+    public void setStartingPositions(Set<Point> startingPositions) {
+        this.startingPositions = startingPositions;
+    }
+
+    public Set<Point> getTargetPositions() {
+        return targetPositions;
+    }
+
+    public void setTargetPositions(Set<Point> targetPositions) {
+        this.targetPositions = targetPositions;
+    }
 }
