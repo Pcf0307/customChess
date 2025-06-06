@@ -6,45 +6,91 @@ import com.pcf.base_model.model.BaseChessBoard;
 import com.pcf.base_model.model.BaseChessPiece;
 import com.pcf.base_model.utils.Constants;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class HalmaChessBoard extends BaseChessBoard {
-    private int boardSize;
-    //todo 可以用 Map<Point, BaseChessPiece>
-    private BaseChessPiece[][] grid = new BaseChessPiece[Constants.HALMA_CHESS_BOARD_WIDTH][Constants.HALMA_CHESS_BOARD_LENGTH];
-    private Set<Point> startingPositions;
-    private Set<Point> targetPositions;
+    private int boardRows;
+    private int boardCols;
+    private List<Point> focusPoints;
+    private List<HalmaChessPiece> blackChessPieces = new ArrayList<>();
+    private List<HalmaChessPiece> whiteChessPieces = new ArrayList<>();
+    private List<Point> whiteStartingPositions = new ArrayList<>();
+    private List<Point> whiteTargetPositions = new ArrayList<>();
+    private List<Point> blackStartingPositions = new ArrayList<>();
+    private List<Point> blackTargetPositions = new ArrayList<>();
     //moveHistory
 
-    public int getBoardSize() {
-        return boardSize;
+    public int getBoardRows() {
+        return boardRows;
     }
 
-    public void setBoardSize(int boardSize) {
-        this.boardSize = boardSize;
+    public void setBoardRows(int boardRows) {
+        this.boardRows = boardRows;
     }
 
-    public BaseChessPiece[][] getGrid() {
-        return grid;
+    public int getBoardCols() {
+        return boardCols;
     }
 
-    public void setGrid(BaseChessPiece[][] grid) {
-        this.grid = grid;
+    public void setBoardCols(int boardCols) {
+        this.boardCols = boardCols;
     }
 
-    public Set<Point> getStartingPositions() {
-        return startingPositions;
+    public List<Point> getFocusPoints() {
+        return focusPoints;
     }
 
-    public void setStartingPositions(Set<Point> startingPositions) {
-        this.startingPositions = startingPositions;
+    public void setFocusPoints(List<Point> focusPoints) {
+        this.focusPoints = focusPoints;
     }
 
-    public Set<Point> getTargetPositions() {
-        return targetPositions;
+    public List<Point> getWhiteStartingPositions() {
+        return whiteStartingPositions;
     }
 
-    public void setTargetPositions(Set<Point> targetPositions) {
-        this.targetPositions = targetPositions;
+    public void setWhiteStartingPositions(List<Point> whiteStartingPositions) {
+        this.whiteStartingPositions = whiteStartingPositions;
+    }
+
+    public List<Point> getWhiteTargetPositions() {
+        return whiteTargetPositions;
+    }
+
+    public void setWhiteTargetPositions(List<Point> whiteTargetPositions) {
+        this.whiteTargetPositions = whiteTargetPositions;
+    }
+
+    public List<Point> getBlackStartingPositions() {
+        return blackStartingPositions;
+    }
+
+    public void setBlackStartingPositions(List<Point> blackStartingPositions) {
+        this.blackStartingPositions = blackStartingPositions;
+    }
+
+    public List<Point> getBlackTargetPositions() {
+        return blackTargetPositions;
+    }
+
+    public void setBlackTargetPositions(List<Point> blackTargetPositions) {
+        this.blackTargetPositions = blackTargetPositions;
+    }
+
+    public List<HalmaChessPiece> getBlackChessPieces() {
+        return blackChessPieces;
+    }
+
+    public void setBlackChessPieces(List<HalmaChessPiece> blackChessPieces) {
+        this.blackChessPieces = blackChessPieces;
+    }
+
+    public List<HalmaChessPiece> getWhiteChessPieces() {
+        return whiteChessPieces;
+    }
+
+    public void setWhiteChessPieces(List<HalmaChessPiece> whiteChessPieces) {
+        this.whiteChessPieces = whiteChessPieces;
     }
 }
