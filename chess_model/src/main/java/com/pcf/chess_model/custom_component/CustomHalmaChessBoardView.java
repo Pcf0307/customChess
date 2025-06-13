@@ -2,7 +2,6 @@ package com.pcf.chess_model.custom_component;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
@@ -11,22 +10,12 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.databinding.BindingAdapter;
-import androidx.databinding.InverseBindingAdapter;
-import androidx.databinding.InverseBindingListener;
 
-import com.pcf.base_model.model.BaseChessBoard;
-import com.pcf.base_model.model.BaseChessPiece;
-import com.pcf.chess_model.R;
-import com.pcf.chess_model.factory.HalmaChessFactory;
+import com.pcf.chess_model.engine.HalmaGameEngine;
 import com.pcf.chess_model.model.HalmaChessBoard;
 import com.pcf.chess_model.model.HalmaChessPiece;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class CustomHalmaChessBoardView extends View {
     private static final String TAG = CustomHalmaChessBoardView.class.getSimpleName();
@@ -35,8 +24,8 @@ public class CustomHalmaChessBoardView extends View {
     private Paint whitePieceBorderPaint;
     private Paint blackPiecePaint;
     private Paint blackPieceBorderPaint;
-    private HalmaChessFactory halmaChessFactory;
-    private HalmaChessBoard chessBoard;
+    private Paint highlightPaint;
+    private Paint selectedPaint;
     int rows;
     int cols;
     int startX;
@@ -45,26 +34,24 @@ public class CustomHalmaChessBoardView extends View {
     int endY;
     int minInterval;
     private static final int PIECE_RADIUS = 20;
-    private static final int BORDER_WIDTH = 4;
-
+    private static final float BORDER_WIDTH = 4;
+    private HalmaGameEngine gameEngine;
+    private HalmaChessBoard chessBoard;
     public CustomHalmaChessBoardView(Context context) {
         super(context);
-        init();
     }
 
     public CustomHalmaChessBoardView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
     }
 
     public CustomHalmaChessBoardView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
-    private void init() {
-        halmaChessFactory = new HalmaChessFactory();
-        chessBoard = halmaChessFactory.createChessBoard();
+    public void init(HalmaGameEngine gameEngine) {
+        this.gameEngine = gameEngine;
+        chessBoard = gameEngine.getBoard();
         initPaint();
     }
 
@@ -99,6 +86,21 @@ public class CustomHalmaChessBoardView extends View {
         whitePieceBorderPaint.setStyle(Paint.Style.STROKE);
         whitePieceBorderPaint.setStrokeWidth(BORDER_WIDTH);
         whitePieceBorderPaint.setAntiAlias(true);
+
+        // 高亮可走路径
+        highlightPaint = new Paint();
+        highlightPaint.setColor(getContext().getColor(com.pcf.base_model.R.color.base_highlight_blue));
+        highlightPaint.setStyle(Paint.Style.STROKE);
+        highlightPaint.setStrokeWidth(6f);
+        highlightPaint.setAntiAlias(true);
+
+        // 高亮选中的棋子
+        selectedPaint = new Paint();
+        selectedPaint.setColor(getContext().getColor(com.pcf.base_model.R.color.base_red));
+        selectedPaint.setStyle(Paint.Style.STROKE);
+        selectedPaint.setStrokeWidth(8f);
+        selectedPaint.setAntiAlias(true);
+
     }
 
     @Override
@@ -109,8 +111,8 @@ public class CustomHalmaChessBoardView extends View {
         int width = getWidth() - getPaddingStart() - getPaddingEnd();
         int height = getHeight() - getPaddingTop() - getPaddingBottom();
         // 棋盘的行 列数
-        rows = chessBoard.getBoardRows();
-        cols = chessBoard.getBoardCols();
+        rows = gameEngine.getBoard().getBoardRows();
+        cols = gameEngine.getBoard().getBoardCols();
         // 间隔数
         int rowIntervalNum = cols - 1;
         int colsIntervalNum = rows - 1;
@@ -134,30 +136,7 @@ public class CustomHalmaChessBoardView extends View {
                 points[i][j] = new Point(x, y);
             }
         }
-
-        // 初始化起始坐标 终点坐标
-        List<Point> blackStartingPositions = chessBoard.getBlackStartingPositions();
-        List<Point> blackTargetPositions = chessBoard.getBlackTargetPositions();
-        List<Point> whiteStartingPositions = chessBoard.getWhiteStartingPositions();
-        List<Point> whiteTargetPositions = chessBoard.getWhiteTargetPositions();
-        for (int j = 0; j < 4; j++) {
-            for (int i = 0; i < 4; i++) {
-                whiteStartingPositions.add(points[i][j]);
-                blackTargetPositions.add(points[i][j]);
-                HalmaChessPiece chessPiece = halmaChessFactory.createChessPiece();
-                chessPiece.setPosition(points[i][j]);
-                chessBoard.getWhiteChessPieces().add(chessPiece);
-            }
-        }
-        for (int j = rows - 1; j > rows - 5; j--) {
-            for (int i = cols - 1; i > cols - 5; i--) {
-                blackStartingPositions.add(points[i][j]);
-                whiteTargetPositions.add(points[i][j]);
-                HalmaChessPiece chessPiece = halmaChessFactory.createChessPiece();
-                chessPiece.setPosition(points[i][j]);
-                chessBoard.getBlackChessPieces().add(chessPiece);
-            }
-        }
+        gameEngine.initPiece(points);
     }
 
     @Override
@@ -176,24 +155,29 @@ public class CustomHalmaChessBoardView extends View {
             canvas.drawLine(x, startY, x, endY, boardPaint);
         }
 
-        // 绘制棋子
-        chessBoard.getBlackChessPieces().forEach(halmaChessPiece -> {
-            Point position = halmaChessPiece.getPosition();
-            // 边框
-            canvas.drawCircle(position.x, position.y, PIECE_RADIUS, blackPieceBorderPaint);
-            // 内部
-            canvas.drawCircle(position.x, position.y, PIECE_RADIUS - BORDER_WIDTH / 2, blackPiecePaint);
+        // 画棋子（黑白）
+        drawPieces(canvas, chessBoard.getBlackChessPieces(), blackPiecePaint, blackPieceBorderPaint);
+        drawPieces(canvas, chessBoard.getWhiteChessPieces(), whitePiecePaint, whitePieceBorderPaint);
 
-        });
-        chessBoard.getWhiteChessPieces().forEach(halmaChessPiece -> {
-            Point position = halmaChessPiece.getPosition();
-            // 边框
-            canvas.drawCircle(position.x, position.y, PIECE_RADIUS, whitePieceBorderPaint);
-            // 内部
-            canvas.drawCircle(position.x, position.y, PIECE_RADIUS - BORDER_WIDTH / 2, whitePiecePaint);
-        });
+        // 绘制可走路线
+        for (Point p : gameEngine.getHighlightPath()) {
+            canvas.drawCircle(p.x,p.y,PIECE_RADIUS,highlightPaint);
+        }
+
+        // 高亮选中棋子
+        HalmaChessPiece selectPiece = gameEngine.getSelectPiece();
+        if (selectPiece != null) {
+            Point position = selectPiece.getPosition();
+            canvas.drawCircle(position.x,position.y,PIECE_RADIUS,selectedPaint);
+        }
     }
-
+    private void drawPieces(Canvas canvas, List<HalmaChessPiece> pieces, Paint fill, Paint border) {
+        for (HalmaChessPiece piece : pieces) {
+            Point p = piece.getPosition();
+            canvas.drawCircle(p.x, p.y, PIECE_RADIUS, border);
+            canvas.drawCircle(p.x, p.y, PIECE_RADIUS - BORDER_WIDTH / 2f, fill);
+        }
+    }
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // 为了满足辅助功能的要求，在 ACTION_UP 时调用 performClick()
@@ -215,59 +199,36 @@ public class CustomHalmaChessBoardView extends View {
         // 检查黑棋
         for (HalmaChessPiece piece : chessBoard.getBlackChessPieces()) {
             Point pos = piece.getPosition();
-            if (isPointInsideCircle(touchX, touchY, pos.x, pos.y, PIECE_RADIUS)) {
+            if (isPointInsideCircle(touchX, touchY, pos.x, pos.y)) {
                 // 点击到黑棋，进行相应处理
-                onChessPieceClicked(piece);
+                gameEngine.handlePieceClick(piece);
+                invalidate();
                 return;
             }
         }
         // 检查白棋
         for (HalmaChessPiece piece : chessBoard.getWhiteChessPieces()) {
             Point pos = piece.getPosition();
-            if (isPointInsideCircle(touchX, touchY, pos.x, pos.y, PIECE_RADIUS)) {
+            if (isPointInsideCircle(touchX, touchY, pos.x, pos.y)) {
                 // 点击到白棋，进行相应处理
-                onChessPieceClicked(piece);
+                gameEngine.handlePieceClick(piece);
+                invalidate();
                 return;
             }
         }
+
+        int col = Math.round((touchX - startX) / (float) minInterval);
+        int row = Math.round((touchY - startY) / (float) minInterval);
+        if (col >= 0 && col < cols && row >= 0 && row < rows) {
+            Point boardPoint = new Point(startX + col * minInterval, startY + row * minInterval);
+            gameEngine.handleBoardClick(boardPoint);
+            invalidate();
+        }
     }
-    private boolean isPointInsideCircle(float touchX, float touchY, int centerX, int centerY, int radius) {
+    private boolean isPointInsideCircle(float touchX, float touchY, int centerX, int centerY) {
         // 计算点击点与圆心之间的距离
         float dx = touchX - centerX;
         float dy = touchY - centerY;
-        return (dx * dx + dy * dy) <= radius * radius;
+        return (dx * dx + dy * dy) <= CustomHalmaChessBoardView.PIECE_RADIUS * CustomHalmaChessBoardView.PIECE_RADIUS;
     }
-    private void onChessPieceClicked(HalmaChessPiece piece){
-        Log.d(TAG, "onChessPieceClicked: " + piece.toString());
-    }
-
-    //    public BaseChessBoard getBaseChessBoard() {
-//        return baseChessBoard;
-//    }
-//
-//    public void setBaseChessBoard(BaseChessBoard baseChessBoard) {
-//        this.baseChessBoard = baseChessBoard;
-//        invalidate();
-//    }
-
-//    @BindingAdapter("baseChessBoard")
-//    public static void setBaseChessBoard(CustomHalmaChessBoardView view, BaseChessBoard baseChessBoard) {
-//        if (view.getBaseChessBoard() != null && view.getBaseChessBoard().equals(baseChessBoard)) {
-//            return; // 相同则不重新设置，避免不必要的调用
-//        }
-//        view.setBaseChessBoard(baseChessBoard);
-//    }
-//
-//    @InverseBindingAdapter(attribute = "baseChessBoard")
-//    public static BaseChessBoard getBaseChessBoard(CustomHalmaChessBoardView view) {
-//        return view.getBaseChessBoard();
-//    }
-//
-//    @BindingAdapter(value = {"baseChessBoardAttrChanged"}, requireAll = false)
-//    public static void setBaseChessBoardListener(CustomHalmaChessBoardView view, final InverseBindingListener listener) {
-//        if (listener != null) {
-//            // 监听数据变化
-//            listener.onChange();
-//        }
-//    }
 }

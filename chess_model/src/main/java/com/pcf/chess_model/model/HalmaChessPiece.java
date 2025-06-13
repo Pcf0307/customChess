@@ -5,7 +5,7 @@ import android.graphics.Point;
 import androidx.annotation.NonNull;
 
 import com.pcf.base_model.model.BaseChessPiece;
-import com.pcf.base_model.state.State;
+import com.pcf.base_model.state_machine.imp.State;
 
 public class HalmaChessPiece extends BaseChessPiece {
     private int id;
@@ -69,6 +69,8 @@ public class HalmaChessPiece extends BaseChessPiece {
     @NonNull
     @Override
     public String toString() {
-        return hashCode() + " x: " + getPosition().x + ",y: " + getPosition().y;
+        return "HalmaChessPiece{" +
+                "position=" + position +
+                '}';
     }
 }

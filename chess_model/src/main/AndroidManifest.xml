@@ -3,6 +3,7 @@
     <application
         android:allowBackup="true">
         <activity android:name=".activity.ChessGameActivity"
+            android:launchMode="standard"
             android:exported="true">
         </activity>
     </application>

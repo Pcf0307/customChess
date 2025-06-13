@@ -10,5 +10,6 @@
     <color name="base_magenta">#FF00FF</color> <!-- 洋红色 -->
     <color name="base_gray">#808080</color> <!-- 灰色 -->
     <color name="base_orange">#FFA500</color> <!-- 橙色 -->
+    <color name="base_highlight_blue">#00CCFF</color>
 
 </resources>

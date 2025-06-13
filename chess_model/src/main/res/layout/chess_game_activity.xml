@@ -16,23 +16,55 @@
         >
 
         <com.pcf.chess_model.custom_component.CustomHalmaChessBoardView
+            android:id="@+id/cus_halma_chess_board"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/base_white"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/btn_start_game"
             android:clickable="true"
-            android:layout_marginTop="100dp"
-            android:layout_marginBottom="200dp"
-            android:layout_marginEnd="40dp"
-            android:layout_marginStart="20dp"
-            android:paddingStart="40dp"
-            android:paddingEnd="40dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_marginVertical="20dp"
+            android:layout_marginHorizontal="20dp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="10dp"
             />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_start_game"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="start game"
+            app:layout_constraintBottom_toTopOf="@+id/btn_stop_game"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_stop_game"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="stop game"
+            app:layout_constraintBottom_toTopOf="@+id/btn_cancel_stop_game"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_cancel_stop_game"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="cancel stop game"
+            app:layout_constraintBottom_toTopOf="@+id/btn_exit_game"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_exit_game"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="exit game"
+            app:layout_constraintBottom_toTopOf="@+id/btn_restart_game"
+            />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_restart_game"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="restart game"
+            app:layout_constraintBottom_toBottomOf="parent"
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

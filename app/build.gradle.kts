@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.pcf.customchess"
+    namespace = "com.pcf.custom_chess"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.pcf.customchess"
+        applicationId = "com.pcf.custom_chess"
         minSdk = 29
         targetSdk = 33
         versionCode = 1
